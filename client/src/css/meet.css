@@ -3,7 +3,7 @@
   padding: 0px;
   margin: 0px;
   background-color: black;
-  height: 100vh;
+  min-height: 100vh;
   width: 100vw;
 }
 .meet_bottom {
@@ -160,4 +160,11 @@ p {
     min-height: 40px;
     min-width: 40px;
   }
+}
+.meet_videos_section{
+  padding: 2px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
 }

@@ -1,8 +1,10 @@
 import React from "react";
-import "../css/videos.css";
+import "../css/video.css";
 const Video = ({ refProp }) => {
   return (
-    <div className="single_video">{/* <video ref={refProp}></video> */}</div>
+    <div className="single_video">
+      <video ref={refProp}></video>
+    </div>
   );
 };
 

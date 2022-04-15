@@ -30,13 +30,7 @@ import { useSelector } from "react-redux";
 import Peer from "peerjs";
 import { meetSocket } from "../App";
 
-const setStreamToRef = (stream, ref) => {
-  ref.current.srcObject = stream;
-  ref.current.play();
-};
-
 const MeetPage = () => {
-  const [myStream, setMyStream] = useState(null);
   const myVideo = useRef(null);
   const userVideo = useRef(null);
   const peerInstance = useRef(null);
@@ -50,42 +44,39 @@ const MeetPage = () => {
       debug: 3,
       secure: false,
     });
-
     peer.on("open", (id) => {
       console.log("peer connected with : ", id);
     });
-
-    peer.on("call", (call) => {
-      navigator.mediaDevices
-        .getUserMedia({ video: true, audio: true })
-        .then((stream) => {
-          myVideo.current.srcObject = stream;
-          myVideo.current.play();
-          //setStreamToRef(stream, myVideo);
-          setMyStream(myVideo);
+    navigator.mediaDevices
+      .getUserMedia({ video: true, audio: false })
+      .then((stream) => {
+        myVideo.current.srcObject = stream;
+        myVideo.current.play();
+        myVideo.current.muted = true;
+        // emitted when any remote peer tries to call you
+        peer.on("call", (call) => {
           call.answer(stream);
           call.on("stream", (userStream) => {
-            setStreamToRef(userStream, userVideo);
+            userVideo.current.srcObject = userStream;
+            userVideo.current.play();
+            userVideo.current.muted = true;
           });
         });
-    });
-
-    meetSocket.on("user-connected", (userId) => {
-      console.log("user joined room with id: ", userId);
-      setTimeout(callNewUser, 1000, userId, myStream, peer);
-    });
+        meetSocket.on("user-connected", (userId) => {
+          console.log("user joined room with id: ", userId);
+          // whenever someone connects then call them
+          setTimeout(() => {
+            const call = peer.call(userId, stream);
+            call.on("stream", (userVideoStream) => {
+              userVideo.current.srcObject = userVideoStream;
+              userVideo.current.play();
+              userVideo.current.muted = true;
+            });
+          }, 1000);
+        });
+      });
     peerInstance.current = peer;
   }, []);
-
-  const callNewUser = (userId, stream, peer) => {
-    console.log("user", userId);
-    const call = peer.call(userId, stream);
-    console.log("call", call);
-    call.on("stream", (userVideoStream) => {
-      userVideo.current.srcObject = userVideoStream;
-      userVideo.current.play();
-    });
-  };
 
   return (
     <>
@@ -95,8 +86,8 @@ const MeetPage = () => {
           <MeetingDetails />
           <div className="meetPage">
             <div className="meet_videos_section">
-              <video ref={myVideo} />
-              <video ref={userVideo} />
+              <Video refProp={myVideo} />
+              <Video refProp={userVideo} />
             </div>
             <div className="meet_bottom">
               <div className="bottom_options bottom_options_left">
