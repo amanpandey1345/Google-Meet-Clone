@@ -96,7 +96,7 @@ const MeetPage = () => {
           <div className="meetPage">
             <div className="meet_videos_section">
               <video ref={myVideo} />
-              <video ref={userVideo} />
+              {userVideo && <video ref={userVideo} />}
             </div>
             <div className="meet_bottom">
               <div className="bottom_options bottom_options_left">
