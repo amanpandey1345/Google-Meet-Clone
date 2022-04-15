@@ -87,7 +87,7 @@ const MeetPage = () => {
           <div className="meetPage">
             <div className="meet_videos_section">
               <Video refProp={myVideo} />
-              <Video refProp={userVideo} />
+              {userVideo !== null ? <Video refProp={userVideo} /> : null}
             </div>
             <div className="meet_bottom">
               <div className="bottom_options bottom_options_left">
